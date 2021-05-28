@@ -5,6 +5,7 @@ import com.web.dao.DaoHelperFactory;
 import com.web.exception.ConnectionException;
 import com.web.parser.TermsParser;
 import com.web.service.DatabaseService;
+import com.web.writer.CsvFileWriter;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -28,6 +29,8 @@ public class CommandFactory {
                 return new ShowPageCommand(DATA_FORM_PAGE);
             case "crawl":
                 return new CrawlCommand(new DatabaseService(helper.createPageStatisticsDao(), helper.createLinkDao(), helper.createTermDao()), new TermsParser());
+            case "getCsvFiles":
+                return new PrintStatisticsCommand(new DatabaseService(helper.createPageStatisticsDao(), helper.createLinkDao(), helper.createTermDao()), new CsvFileWriter(helper.createPageStatisticsDao()));
             default:
                 throw new IllegalArgumentException("Unknown type of Command " + type);
         }

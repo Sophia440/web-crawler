@@ -5,6 +5,7 @@ import com.web.entity.Link;
 import com.web.exception.DaoException;
 import com.web.mapper.LinkRowMapper;
 
+import java.util.List;
 import java.util.Optional;
 
 public class LinkDao extends AbstractDao<Link> implements Dao<Link> {
@@ -49,7 +50,6 @@ public class LinkDao extends AbstractDao<Link> implements Dao<Link> {
     }
 
     public Optional<Link> getByUrl(String url) throws DaoException {
-        System.out.println(url);
         return executeForSingleResult(FIND_LINK_BY_URL, new LinkRowMapper(), url);
     }
 }

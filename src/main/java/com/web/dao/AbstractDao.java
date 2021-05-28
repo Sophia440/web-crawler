@@ -33,8 +33,8 @@ public abstract class AbstractDao<T extends Identifiable> implements Dao<T> {
         }
     }
 
-    protected int executeQuery(String query, String columnLabel) throws DaoException {
-        try (PreparedStatement statement = createStatement(query)) {
+    protected int executeQuery(String query, String columnLabel, Object... params) throws DaoException {
+        try (PreparedStatement statement = createStatement(query, params)) {
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             int result = resultSet.getInt(columnLabel);

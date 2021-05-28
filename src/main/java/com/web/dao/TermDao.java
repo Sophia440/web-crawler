@@ -49,7 +49,6 @@ public class TermDao extends AbstractDao<Term> implements Dao<Term>{
     }
 
     public Optional<Term> getByName(String name) throws DaoException {
-        System.out.println(name);
         return executeForSingleResult(FIND_TERM_BY_NAME, new TermRowMapper(), name);
     }
 }

@@ -11,15 +11,37 @@
 </head>
 <body>
     <h2>Results</h2>
-    <c:if test="${not empty errorMessage}">
-        <p>${errorMessage}</p>
-    </c:if>
-    <ol>
-        <c:if test="${not empty termsSet}">
-            <c:forEach items="${termsSet}" var="term">
-                <li>${term}</li>
-            </c:forEach>
-        </c:if>
-    </ol>
+    <c:choose>
+        <c:when test="${not empty errorMessage}">
+            <p>${errorMessage}</p>
+        </c:when>
+        <c:otherwise>
+            <p>Crawling is finished! List of terms:</p>
+            <ol>
+                <c:if test="${not empty termsSet}">
+                    <c:forEach items="${termsSet}" var="term">
+                        <li>${term}</li>
+                    </c:forEach>
+                </c:if>
+            </ol
+            <br><br>
+            <p>Top 10 hits</p>
+            <ol>
+                <c:if test="${not empty topHits}">
+                    <c:forEach items="${topHits}" var="link">
+                        <li>${link.url}, ${link.totalHits} hits</li>
+                    </c:forEach>
+                </c:if>
+            </ol>
+            <p>Press the button below to print statistics into a CSV-file</p>
+            <form action="${pageContext.request.contextPath}/controller?command=getCsvFiles" method="post">
+                <button type="submit" value="submit">Get CSV</button>
+            </form>
+            <c:if test="${not empty printingMessage}">
+                <p>${printingMessage}</p>
+            </c:if>
+        </c:otherwise>
+    </c:choose>
+
 </body>
 </html>

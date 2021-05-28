@@ -1,5 +1,6 @@
 package com.web.service;
 
+import com.web.comparator.LinkComparator;
 import com.web.dao.LinkDao;
 import com.web.dao.PageStatisticsDao;
 import com.web.dao.TermDao;
@@ -12,13 +13,10 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
+import java.io.*;
 import java.sql.*;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DatabaseService {
     public static final Logger LOGGER = LogManager.getLogger(DatabaseService.class);
@@ -26,8 +24,7 @@ public class DatabaseService {
     private static final String MYSQL_URL = "jdbc:mysql://localhost:3307/?useSSL=false&serverTimezone=Europe/Minsk";
     private static final String MYSQL_USERNAME = "root";
     private static final String MYSQL_PASSWORD = "root";
-    //private static final String SCRIPT_PATH = "C:/Users/100nout.by/JWD/web-crawler/src/main/resources/init_db.sql";
-    private static final String SCRIPT_PATH = "./src/main/resources/init_db.sql";
+    private static final String SCRIPT_PATH = "init_db.sql";
 
     private PageStatisticsDao pageStatisticsDao;
     private LinkDao linkDao;
@@ -39,15 +36,27 @@ public class DatabaseService {
         this.termDao = termDao;
     }
 
+    private InputStream getFileFromResourceAsStream(String fileName) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream(fileName);
+        if (inputStream == null) {
+            throw new IllegalArgumentException("file not found! " + fileName);
+        } else {
+            return inputStream;
+        }
+    }
+
     public void initDatabase() throws ServiceException {
         try {
             driver = new com.mysql.cj.jdbc.Driver();
             DriverManager.registerDriver(driver);
             Connection connection = DriverManager.getConnection(MYSQL_URL, MYSQL_USERNAME, MYSQL_PASSWORD);
             ScriptRunner scriptRunner = new ScriptRunner(connection);
-            Reader reader = new BufferedReader(new FileReader(SCRIPT_PATH));
+            InputStream initialStream = getFileFromResourceAsStream(SCRIPT_PATH);
+            Reader reader = new InputStreamReader(initialStream);
             scriptRunner.runScript(reader);
-        } catch (SQLException | FileNotFoundException exception) {
+            reader.close();
+        } catch (SQLException | IOException exception) {
             throw new ServiceException(exception.getMessage(), exception);
         }
     }
@@ -115,5 +124,40 @@ public class DatabaseService {
             return null;
         }
         return null;
+    }
+
+    public List<Link> getTop(int count) {
+        List<Link> allLinks = getAllLinks();
+        List<Link> topHits = null;
+        try {
+            for (Link current : allLinks) {
+                int totalHits = pageStatisticsDao.getTotalHitsByLinkId(current.getId());
+                current.setTotalHits(totalHits);
+            }
+            topHits = allLinks.stream().sorted(new LinkComparator()).limit(count).collect(Collectors.toList());
+        } catch (DaoException exception) {
+            LOGGER.fatal(exception.getMessage(), exception);
+        }
+        return topHits;
+    }
+
+    public List<Link> getAllLinks() {
+        List<Link> allLinks = null;
+        try {
+            allLinks = linkDao.getAll();
+        } catch (DaoException exception) {
+            LOGGER.fatal(exception.getMessage(), exception);
+        }
+        return allLinks;
+    }
+
+    public List<Term> getAllTerms() {
+        List<Term> allTerms = null;
+        try {
+            allTerms = termDao.getAll();
+        } catch (DaoException exception) {
+            LOGGER.fatal(exception.getMessage(), exception);
+        }
+        return allTerms;
     }
 }

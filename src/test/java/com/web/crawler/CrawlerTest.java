@@ -17,7 +17,6 @@ import static org.mockito.Mockito.mock;
 
 public class CrawlerTest {
     private static final Set<String> TERMS = new HashSet<>(Arrays.asList("Term1", "Term2"));
-    private static final Set<String> TERMS2 = new HashSet<>(Arrays.asList("Musk", "Tesla"));
     private static final DatabaseService SERVICE = new DatabaseService(mock(PageStatisticsDao.class), mock(LinkDao.class), mock(TermDao.class));
     private static final Crawler CRAWLER = new Crawler(SERVICE, TERMS);
     private static final String STATISTICS_DOCUMENT_PATH = "./src/test/resources/test_count_terms.html";
@@ -32,10 +31,4 @@ public class CrawlerTest {
         Map<String, Integer> actualStatistics = CRAWLER.getPageStatistics(TERMS, statisticsDocument);
         Assert.assertEquals(EXPECTED_STATISTICS, actualStatistics);
     }
-
-//    public static void main(String[] args) {
-//        Crawler crawler = new Crawler(SERVICE, TERMS2);
-//        crawler.start("https://en.wikipedia.org/wiki/Elon_Musk");
-//    }
-
 }

@@ -7,6 +7,7 @@ public class Link implements Identifiable {
 
     private Long id;
     private String url;
+    private int totalHits;
 
     public Link() {
     }
@@ -35,5 +36,13 @@ public class Link implements Identifiable {
     @Override
     public Long getId() {
         return id;
+    }
+
+    public void setTotalHits(int totalHits) {
+        this.totalHits = totalHits;
+    }
+
+    public int getTotalHits() {
+        return totalHits;
     }
 }

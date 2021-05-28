@@ -1,6 +1,8 @@
 package com.web.command;
 
 import com.web.crawler.Crawler;
+import com.web.dto.LinkDto;
+import com.web.entity.Link;
 import com.web.exception.ServiceException;
 import com.web.parser.Parser;
 import com.web.service.DatabaseService;
@@ -18,6 +20,7 @@ public class CrawlCommand implements Command {
     private static final Logger LOGGER = LogManager.getLogger(CrawlCommand.class);
     public static final String ERROR_MESSAGE = "An error has occurred. See logs for further information.";
     public static final String RESULT_PAGE = "/view/result_page.jsp";
+    public static final int TOP_COUNT = 10;
     private DatabaseService databaseService;
     private Parser parser;
 
@@ -48,6 +51,9 @@ public class CrawlCommand implements Command {
                 crawler.setMaxVisitedPages(maxPages);
             }
             crawler.start(seedUrl);
+            List<Link> topHits = databaseService.getTop(TOP_COUNT);
+            session.setAttribute("topHits", topHits);
+            session.setAttribute("link", new LinkDto());
         } catch (ServiceException exception) {
             LOGGER.fatal(exception.getMessage(), exception);
             session.setAttribute("errorMessage", ERROR_MESSAGE);

@@ -12,7 +12,7 @@
   <h2>Enter the data for crawling</h2>
   <p>Note: Please, separate terms with commas (,)</p>
   <p>If you want to use default values for max depth and max visited pages, then leave those fields empty.</p>
-  <form class="login-form" action="${pageContext.request.contextPath}/controller?command=crawl" method="post">
+  <form action="${pageContext.request.contextPath}/controller?command=crawl" method="post">
     <label for="url">Url:  </label>
     <input type="url" id="url" name="url" placeholder="https://example">
     <br><br>
